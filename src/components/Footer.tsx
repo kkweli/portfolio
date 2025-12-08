@@ -25,19 +25,54 @@ const Footer = () => {
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-foreground">Quick Links</h3>
             <div className="grid grid-cols-2 gap-2">
-              <a href="/" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+              <a 
+                href="#home" 
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById('home')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="text-sm text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+              >
                 Home
               </a>
-              <a href="/about" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+              <a 
+                href="#about" 
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="text-sm text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+              >
                 About
               </a>
-              <a href="/skills" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+              <a 
+                href="#skills" 
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById('skills')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="text-sm text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+              >
                 Skills
               </a>
-              <a href="/projects" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+              <a 
+                href="#projects" 
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="text-sm text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+              >
                 Projects
               </a>
-              <a href="/contact" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+              <a 
+                href="#contact" 
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="text-sm text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+              >
                 Contact
               </a>
             </div>
