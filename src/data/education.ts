@@ -39,7 +39,7 @@ export const certifications: Certification[] = [
     category: "technical"
   },
   {
-    name: "SBG Team Leadership Programme",
+    name: "SBG Team Leadership Programme - Peer Coaching for Leaders, Managers and Teams",
     issuer: "Grow Consulting SA",
     year: "2024",
     category: "leadership"

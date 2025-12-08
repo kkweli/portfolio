@@ -137,7 +137,11 @@ const Index = () => {
     return colors[category] || "bg-muted/10 text-muted-foreground border-muted/30";
   };
 
-  const certifications = certificationsByCategory.technical.slice(0, 4);
+  const allCertifications = [
+    ...certificationsByCategory.technical,
+    ...certificationsByCategory.leadership,
+    ...certificationsByCategory.banking
+  ];
 
   return (
     <div className="bg-background">
@@ -263,20 +267,61 @@ const Index = () => {
           </div>
 
           {/* Certifications */}
-          <div className="max-w-4xl mx-auto">
-            <h3 className="text-2xl font-bold text-foreground mb-8 text-center">Certifications</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {certifications.map((cert, i) => (
-                <div key={i} className="glass-card p-4 flex items-center space-x-3">
-                  <div className="p-2 bg-primary/10 border border-primary/30 rounded-lg flex-shrink-0">
-                    <Award className="h-4 w-4 text-primary" />
+          <div className="max-w-6xl mx-auto">
+            <h3 className="text-2xl font-bold text-foreground mb-8 text-center">Professional Training & Certifications</h3>
+            
+            {/* Technical Certifications */}
+            <div className="mb-8">
+              <h4 className="text-lg font-semibold text-primary mb-4">Recent & Advanced Tech</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {certificationsByCategory.technical.map((cert, i) => (
+                  <div key={i} className="glass-card p-4 flex items-center space-x-3">
+                    <div className="p-2 bg-primary/10 border border-primary/30 rounded-lg flex-shrink-0">
+                      <Award className="h-4 w-4 text-primary" />
+                    </div>
+                    <div>
+                      <h5 className="text-sm font-semibold text-foreground">{cert.name}</h5>
+                      <p className="text-xs text-muted-foreground">{cert.issuer} • {cert.year}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="text-sm font-semibold text-foreground">{cert.name}</h4>
-                    <p className="text-xs text-muted-foreground">{cert.issuer} • {cert.year}</p>
+                ))}
+              </div>
+            </div>
+
+            {/* Leadership Certifications */}
+            <div className="mb-8">
+              <h4 className="text-lg font-semibold text-primary mb-4">Leadership</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {certificationsByCategory.leadership.map((cert, i) => (
+                  <div key={i} className="glass-card p-4 flex items-center space-x-3">
+                    <div className="p-2 bg-primary/10 border border-primary/30 rounded-lg flex-shrink-0">
+                      <Award className="h-4 w-4 text-primary" />
+                    </div>
+                    <div>
+                      <h5 className="text-sm font-semibold text-foreground">{cert.name}</h5>
+                      <p className="text-xs text-muted-foreground">{cert.issuer} • {cert.year}</p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+            </div>
+
+            {/* Banking & Governance Certifications */}
+            <div>
+              <h4 className="text-lg font-semibold text-primary mb-4">Banking & Governance</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {certificationsByCategory.banking.map((cert, i) => (
+                  <div key={i} className="glass-card p-4 flex items-center space-x-3">
+                    <div className="p-2 bg-primary/10 border border-primary/30 rounded-lg flex-shrink-0">
+                      <Award className="h-4 w-4 text-primary" />
+                    </div>
+                    <div>
+                      <h5 className="text-sm font-semibold text-foreground">{cert.name}</h5>
+                      <p className="text-xs text-muted-foreground">{cert.issuer} • {cert.year}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
