@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { personalInfo } from "@/data/personal";
-import { services } from "@/data/services";
 import { skillCategories } from "@/data/skills";
 import { experiences } from "@/data/experience";
 import { featuredProjects } from "@/data/projects";
