@@ -55,7 +55,6 @@ Automatic deployment to GitHub Pages via GitHub Actions on push to `main` branch
 
 ## Contact
 
-- **Email**: <wanjohi_gm@live.com>
 - **GitHub**: [@kkweli](https://github.com/kkweli)
 - **LinkedIn**: [wanjohigm](https://linkedin.com/in/wanjohigm)
 
