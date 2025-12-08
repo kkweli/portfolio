@@ -467,8 +467,20 @@ const Index = () => {
                   ].map((item, i) => (
                     <div key={i}>
                       {item.href ? (
-                        <a href={item.href} target="_blank" rel="noopener noreferrer"
-                          className="flex items-center space-x-4 p-3 rounded-lg hover:bg-secondary/30 transition-colors group cursor-pointer">
+                        <a 
+                          href={item.href} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          onClick={(e) => {
+                            console.log('Link clicked:', item.href);
+                            // Ensure link works
+                            if (!e.defaultPrevented) {
+                              window.open(item.href, '_blank', 'noopener,noreferrer');
+                            }
+                          }}
+                          className="flex items-center space-x-4 p-3 rounded-lg hover:bg-secondary/30 transition-colors group cursor-pointer"
+                          style={{ pointerEvents: 'auto', zIndex: 10 }}
+                        >
                           <div className="p-2 bg-primary/10 border border-primary/30 rounded-lg group-hover:bg-primary/20 transition-colors">
                             <item.icon className="h-5 w-5 text-primary" />
                           </div>
@@ -498,7 +510,7 @@ const Index = () => {
             {/* Contact Form */}
             <div className="glass-card glow-border p-8">
               <h3 className="text-xl font-bold text-foreground mb-6">Send a Message</h3>
-              <form onSubmit={handleSubmit} className="space-y-5">
+              <form onSubmit={handleSubmit} className="space-y-5" style={{ pointerEvents: 'auto', zIndex: 10 }}>
                 <div>
                   <label className="text-sm font-medium text-foreground mb-2 block">Name *</label>
                   <Input 
