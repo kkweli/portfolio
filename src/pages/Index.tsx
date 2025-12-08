@@ -86,23 +86,44 @@ const Index = () => {
 
     setIsSubmitting(true);
 
-    // Create mailto link with form data
-    const subject = formData.subject || "Portfolio Contact Form";
-    const body = `Name: ${formData.name}%0D%0AEmail: ${formData.email}%0D%0A%0D%0AMessage:%0D%0A${formData.message}`;
-    const mailtoLink = `mailto:${personalInfo.email}?subject=${encodeURIComponent(subject)}&body=${body}`;
-    
-    // Open email client
-    window.location.href = mailtoLink;
+    try {
+      // Send email using Formspree
+      const response = await fetch('https://formspree.io/f/xanyqvvb', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          subject: formData.subject || "Portfolio Contact Form",
+          message: formData.message,
+          _subject: `[Portfolio - HIGH PRIORITY] ${formData.subject || 'New Contact Form Submission'}`,
+          _replyto: formData.email,
+        }),
+      });
 
-    // Simulate sending delay
-    await new Promise(r => setTimeout(r, 1000));
-    
-    setIsSubmitting(false);
-    setIsSubmitted(true);
-    toast({ title: "Email Client Opened!", description: "Your message is ready to send." });
-    setFormData({ name: "", email: "", subject: "", message: "" });
-    setFormErrors({ name: "", email: "", message: "" });
-    setTimeout(() => setIsSubmitted(false), 3000);
+      if (response.ok) {
+        setIsSubmitted(true);
+        toast({ 
+          title: "Message Sent Successfully!", 
+          description: "I'll get back to you soon." 
+        });
+        setFormData({ name: "", email: "", subject: "", message: "" });
+        setFormErrors({ name: "", email: "", message: "" });
+        setTimeout(() => setIsSubmitted(false), 3000);
+      } else {
+        throw new Error('Failed to send message');
+      }
+    } catch (error) {
+      toast({ 
+        title: "Error", 
+        description: "Failed to send message. Please try again or email me directly.", 
+        variant: "destructive" 
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const getCategoryColor = (category: string) => {
@@ -402,7 +423,7 @@ const Index = () => {
                     <div key={i}>
                       {item.href ? (
                         <a href={item.href} target="_blank" rel="noopener noreferrer"
-                          className="flex items-center space-x-4 p-3 rounded-lg hover:bg-secondary/30 transition-colors group">
+                          className="flex items-center space-x-4 p-3 rounded-lg hover:bg-secondary/30 transition-colors group cursor-pointer">
                           <div className="p-2 bg-primary/10 border border-primary/30 rounded-lg group-hover:bg-primary/20 transition-colors">
                             <item.icon className="h-5 w-5 text-primary" />
                           </div>
