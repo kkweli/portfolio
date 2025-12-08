@@ -75,6 +75,12 @@ export const certifications: Certification[] = [
     category: "banking"
   },
   {
+    name: "Occupation & Health Safety",
+    issuer: "DOSH",
+    year: "2015 - 2022",
+    category: "banking"
+  },
+  {
     name: "System Administration T24",
     issuer: "Jethro LTD",
     year: "2015",

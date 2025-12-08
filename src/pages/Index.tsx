@@ -21,6 +21,7 @@ const Index = () => {
 
   // Contact form state
   const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "" });
+  const [formErrors, setFormErrors] = useState({ name: "", email: "", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -40,21 +41,68 @@ const Index = () => {
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    // Clear error when user starts typing
+    if (formErrors[name as keyof typeof formErrors]) {
+      setFormErrors(prev => ({ ...prev, [name]: "" }));
+    }
+  };
+
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.email || !formData.message) {
-      toast({ title: "Error", description: "Please fill all required fields.", variant: "destructive" });
+    
+    // Validation
+    const errors = { name: "", email: "", message: "" };
+    let hasErrors = false;
+
+    if (!formData.name.trim()) {
+      errors.name = "Name is required";
+      hasErrors = true;
+    }
+
+    if (!formData.email.trim()) {
+      errors.email = "Email is required";
+      hasErrors = true;
+    } else if (!validateEmail(formData.email)) {
+      errors.email = "Please enter a valid email address";
+      hasErrors = true;
+    }
+
+    if (!formData.message.trim()) {
+      errors.message = "Message is required";
+      hasErrors = true;
+    }
+
+    if (hasErrors) {
+      setFormErrors(errors);
+      toast({ title: "Validation Error", description: "Please fix the errors in the form.", variant: "destructive" });
       return;
     }
+
     setIsSubmitting(true);
-    await new Promise(r => setTimeout(r, 1500));
+
+    // Create mailto link with form data
+    const subject = formData.subject || "Portfolio Contact Form";
+    const body = `Name: ${formData.name}%0D%0AEmail: ${formData.email}%0D%0A%0D%0AMessage:%0D%0A${formData.message}`;
+    const mailtoLink = `mailto:${personalInfo.email}?subject=${encodeURIComponent(subject)}&body=${body}`;
+    
+    // Open email client
+    window.location.href = mailtoLink;
+
+    // Simulate sending delay
+    await new Promise(r => setTimeout(r, 1000));
+    
     setIsSubmitting(false);
     setIsSubmitted(true);
-    toast({ title: "Message Sent!", description: "I'll get back to you soon." });
+    toast({ title: "Email Client Opened!", description: "Your message is ready to send." });
     setFormData({ name: "", email: "", subject: "", message: "" });
+    setFormErrors({ name: "", email: "", message: "" });
     setTimeout(() => setIsSubmitted(false), 3000);
   };
 
@@ -243,7 +291,12 @@ const Index = () => {
                       <div key={si}>
                         <div className="flex justify-between items-center mb-2">
                           <span className="text-sm font-medium text-foreground">{skill.name}</span>
-                          <span className="text-xs font-mono text-muted-foreground">{skill.experience}</span>
+                          <span className={`text-xs px-2 py-0.5 rounded-full ${
+                            skill.tag === "Core" ? "bg-blue-500/10 text-blue-400 border border-blue-500/30" :
+                            skill.tag === "Modern Standard" ? "bg-green-500/10 text-green-400 border border-green-500/30" :
+                            skill.tag === "Emerging" ? "bg-purple-500/10 text-purple-400 border border-purple-500/30" :
+                            "bg-orange-500/10 text-orange-400 border border-orange-500/30"
+                          }`}>{skill.tag}</span>
                         </div>
                         <div className="skill-bar">
                           <div
@@ -343,22 +396,22 @@ const Index = () => {
                 <h3 className="text-xl font-bold text-foreground mb-6">Contact Information</h3>
                 <div className="space-y-4">
                   {[
-                    { icon: Mail, label: "Email", value: personalInfo.email, href: `mailto:${personalInfo.email}` },
                     { icon: MapPin, label: "Location", value: personalInfo.location, href: null },
                     { icon: Github, label: "GitHub", value: "@kkweli", href: personalInfo.github },
                     { icon: Linkedin, label: "LinkedIn", value: "wanjohigm", href: personalInfo.linkedin }
                   ].map((item, i) => (
                     <div key={i}>
                       {item.href ? (
-                        <a href={item.href} target={item.href.startsWith("mailto") ? undefined : "_blank"} rel="noopener noreferrer"
-                          className="flex items-center space-x-4 p-3 rounded-lg hover:bg-secondary/30 transition-colors">
-                          <div className="p-2 bg-primary/10 border border-primary/30 rounded-lg">
+                        <a href={item.href} target="_blank" rel="noopener noreferrer"
+                          className="flex items-center space-x-4 p-3 rounded-lg hover:bg-secondary/30 transition-colors group">
+                          <div className="p-2 bg-primary/10 border border-primary/30 rounded-lg group-hover:bg-primary/20 transition-colors">
                             <item.icon className="h-5 w-5 text-primary" />
                           </div>
-                          <div>
+                          <div className="flex-1">
                             <p className="text-xs text-muted-foreground">{item.label}</p>
-                            <p className="text-sm font-medium text-foreground">{item.value}</p>
+                            <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">{item.value}</p>
                           </div>
+                          <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
                         </a>
                       ) : (
                         <div className="flex items-center space-x-4 p-3">
@@ -383,19 +436,48 @@ const Index = () => {
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
                   <label className="text-sm font-medium text-foreground mb-2 block">Name *</label>
-                  <Input name="name" value={formData.name} onChange={handleInputChange} placeholder="Your name" className="bg-secondary/30 border-border/50 focus:border-primary" />
+                  <Input 
+                    name="name" 
+                    value={formData.name} 
+                    onChange={handleInputChange} 
+                    placeholder="Your name" 
+                    className={`bg-secondary/30 border-border/50 focus:border-primary ${formErrors.name ? 'border-red-500' : ''}`}
+                  />
+                  {formErrors.name && <p className="text-xs text-red-500 mt-1">{formErrors.name}</p>}
                 </div>
                 <div>
                   <label className="text-sm font-medium text-foreground mb-2 block">Email *</label>
-                  <Input name="email" type="email" value={formData.email} onChange={handleInputChange} placeholder="your@email.com" className="bg-secondary/30 border-border/50 focus:border-primary" />
+                  <Input 
+                    name="email" 
+                    type="email" 
+                    value={formData.email} 
+                    onChange={handleInputChange} 
+                    placeholder="your@email.com" 
+                    className={`bg-secondary/30 border-border/50 focus:border-primary ${formErrors.email ? 'border-red-500' : ''}`}
+                  />
+                  {formErrors.email && <p className="text-xs text-red-500 mt-1">{formErrors.email}</p>}
                 </div>
                 <div>
                   <label className="text-sm font-medium text-foreground mb-2 block">Subject</label>
-                  <Input name="subject" value={formData.subject} onChange={handleInputChange} placeholder="Project inquiry" className="bg-secondary/30 border-border/50 focus:border-primary" />
+                  <Input 
+                    name="subject" 
+                    value={formData.subject} 
+                    onChange={handleInputChange} 
+                    placeholder="Project inquiry" 
+                    className="bg-secondary/30 border-border/50 focus:border-primary" 
+                  />
                 </div>
                 <div>
                   <label className="text-sm font-medium text-foreground mb-2 block">Message *</label>
-                  <Textarea name="message" value={formData.message} onChange={handleInputChange} placeholder="Tell me about your project..." rows={4} className="bg-secondary/30 border-border/50 focus:border-primary resize-none" />
+                  <Textarea 
+                    name="message" 
+                    value={formData.message} 
+                    onChange={handleInputChange} 
+                    placeholder="Tell me about your project..." 
+                    rows={4} 
+                    className={`bg-secondary/30 border-border/50 focus:border-primary resize-none ${formErrors.message ? 'border-red-500' : ''}`}
+                  />
+                  {formErrors.message && <p className="text-xs text-red-500 mt-1">{formErrors.message}</p>}
                 </div>
                 <Button type="submit" disabled={isSubmitting || isSubmitted} className="w-full btn-primary">
                   {isSubmitting ? (
