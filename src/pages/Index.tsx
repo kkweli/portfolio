@@ -494,40 +494,45 @@ const Index = () => {
                   submitBtn.innerHTML = '<div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>Sending...';
                   
                   try {
-                    // Use a working EmailJS configuration
                     const formData = new FormData(form);
-                    const templateParams = {
-                      from_name: formData.get('name'),
-                      from_email: formData.get('email'),
-                      subject: `[Portfolio - HIGH PRIORITY] ${formData.get('subject') || 'Contact Form Submission'}`,
-                      message: formData.get('message'),
-                      reply_to: formData.get('email')
-                    };
                     
-                    // Send email using EmailJS public service
-                    await emailjs.send(
-                      'service_8hs7kbq', // Public service ID
-                      'template_portfolio', // Template ID
-                      templateParams,
-                      'user_2K8vVqgqWHgqhG7X1' // Public key
-                    );
+                    // Use FormSubmit.co - no API key required
+                    const response = await fetch('https://formsubmit.co/wanjohi_gm@live.com', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                      },
+                      body: JSON.stringify({
+                        name: formData.get('name'),
+                        email: formData.get('email'),
+                        subject: `[Portfolio - HIGH PRIORITY] ${formData.get('subject') || 'Contact Form Submission'}`,
+                        message: formData.get('message'),
+                        _captcha: false,
+                        _template: 'table'
+                      })
+                    });
                     
-                    // Show success message
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Message Sent!';
-                    submitBtn.className = 'w-full bg-green-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-300 flex items-center justify-center';
-                    
-                    // Reset form
-                    form.reset();
-                    
-                    // Reset button after 3 seconds
-                    setTimeout(() => {
-                      submitBtn.innerHTML = originalText;
-                      submitBtn.className = 'w-full bg-primary text-primary-foreground font-semibold py-3 px-6 rounded-lg hover:bg-primary/90 transition-colors duration-300 flex items-center justify-center';
-                    }, 3000);
+                    if (response.ok) {
+                      // Show success message
+                      submitBtn.disabled = false;
+                      submitBtn.innerHTML = '<svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Message Sent!';
+                      submitBtn.className = 'w-full bg-green-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-300 flex items-center justify-center';
+                      
+                      // Reset form
+                      form.reset();
+                      
+                      // Reset button after 3 seconds
+                      setTimeout(() => {
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.className = 'w-full bg-primary text-primary-foreground font-semibold py-3 px-6 rounded-lg hover:bg-primary/90 transition-colors duration-300 flex items-center justify-center';
+                      }, 3000);
+                    } else {
+                      throw new Error('Failed to send message');
+                    }
                     
                   } catch (error) {
-                    console.error('EmailJS Error:', error);
+                    console.error('Form submission error:', error);
                     
                     // Show error message
                     submitBtn.disabled = false;
