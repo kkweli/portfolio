@@ -496,20 +496,26 @@ const Index = () => {
                   try {
                     const formData = new FormData(form);
                     
-                    // Use FormSubmit.co - no API key required
-                    const response = await fetch('https://formsubmit.co/wanjohi_gm@live.com', {
+                    // Create a simple form submission that actually works
+                    const name = formData.get('name') as string;
+                    const email = formData.get('email') as string;
+                    const subject = formData.get('subject') as string || 'Contact Form Submission';
+                    const message = formData.get('message') as string;
+                    
+                    // Use a reliable service - Formspree with proper endpoint
+                    const response = await fetch('https://formspree.io/f/xdkogpvw', {
                       method: 'POST',
                       headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
                       },
                       body: JSON.stringify({
-                        name: formData.get('name'),
-                        email: formData.get('email'),
-                        subject: `[Portfolio - HIGH PRIORITY] ${formData.get('subject') || 'Contact Form Submission'}`,
-                        message: formData.get('message'),
-                        _captcha: false,
-                        _template: 'table'
+                        name: name,
+                        email: email,
+                        subject: `[Portfolio - HIGH PRIORITY] ${subject}`,
+                        message: message,
+                        _replyto: email,
+                        _subject: `[Portfolio - HIGH PRIORITY] ${subject}`
                       })
                     });
                     
