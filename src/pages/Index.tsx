@@ -442,129 +442,140 @@ const Index = () => {
       </section>
 
       {/* ==================== CONTACT SECTION ==================== */}
-      <section id="contact" className="py-24">
+      <section id="contact" className="py-24 bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto text-center mb-16">
-            <div className="inline-flex items-center px-4 py-2 bg-card/50 border border-border/50 rounded-full mb-6">
-              <span className="text-primary font-mono text-sm">~/contact</span>
-            </div>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
               Get In <span className="text-gradient">Touch</span>
             </h2>
             <p className="text-muted-foreground">Have a project in mind? Let's discuss.</p>
           </div>
 
-          <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Contact Info */}
-            <div className="space-y-6">
-              <div className="glass-card glow-border p-8">
-                <h3 className="text-xl font-bold text-foreground mb-6">Contact Information</h3>
-                <div className="space-y-4">
-                  {[
-                    { icon: MapPin, label: "Location", value: personalInfo.location, href: null },
-                    { icon: Github, label: "GitHub", value: "@kkweli", href: personalInfo.github },
-                    { icon: Linkedin, label: "LinkedIn", value: "wanjohigm", href: personalInfo.linkedin }
-                  ].map((item, i) => (
-                    <div key={i}>
-                      {item.href ? (
-                        <a 
-                          href={item.href} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          onClick={(e) => {
-                            console.log('Link clicked:', item.href);
-                            // Ensure link works
-                            if (!e.defaultPrevented) {
-                              window.open(item.href, '_blank', 'noopener,noreferrer');
-                            }
-                          }}
-                          className="flex items-center space-x-4 p-3 rounded-lg hover:bg-secondary/30 transition-colors group cursor-pointer"
-                          style={{ pointerEvents: 'auto', zIndex: 10 }}
-                        >
-                          <div className="p-2 bg-primary/10 border border-primary/30 rounded-lg group-hover:bg-primary/20 transition-colors">
-                            <item.icon className="h-5 w-5 text-primary" />
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-xs text-muted-foreground">{item.label}</p>
-                            <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">{item.value}</p>
-                          </div>
-                          <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                        </a>
-                      ) : (
-                        <div className="flex items-center space-x-4 p-3">
-                          <div className="p-2 bg-primary/10 border border-primary/30 rounded-lg">
-                            <item.icon className="h-5 w-5 text-primary" />
-                          </div>
-                          <div>
-                            <p className="text-xs text-muted-foreground">{item.label}</p>
-                            <p className="text-sm font-medium text-foreground">{item.value}</p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
+          <div className="max-w-4xl mx-auto">
+            {/* Contact Links - Simple and Direct */}
+            <div className="mb-12 text-center">
+              <h3 className="text-xl font-bold text-foreground mb-6">Connect With Me</h3>
+              <div className="flex flex-wrap justify-center gap-4">
+                <a 
+                  href="https://github.com/kkweli" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center px-6 py-3 bg-card border border-border rounded-lg hover:bg-primary hover:text-primary-foreground transition-all duration-300"
+                >
+                  <Github className="h-5 w-5 mr-2" />
+                  GitHub
+                </a>
+                <a 
+                  href="https://linkedin.com/in/wanjohigm" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center px-6 py-3 bg-card border border-border rounded-lg hover:bg-primary hover:text-primary-foreground transition-all duration-300"
+                >
+                  <Linkedin className="h-5 w-5 mr-2" />
+                  LinkedIn
+                </a>
+                <a 
+                  href="mailto:wanjohi_gm@live.com" 
+                  className="inline-flex items-center px-6 py-3 bg-card border border-border rounded-lg hover:bg-primary hover:text-primary-foreground transition-all duration-300"
+                >
+                  <Mail className="h-5 w-5 mr-2" />
+                  Email Me
+                </a>
               </div>
             </div>
 
-            {/* Contact Form */}
-            <div className="glass-card glow-border p-8">
-              <h3 className="text-xl font-bold text-foreground mb-6">Send a Message</h3>
-              <form onSubmit={handleSubmit} className="space-y-5" style={{ pointerEvents: 'auto', zIndex: 10 }}>
-                <div>
-                  <label className="text-sm font-medium text-foreground mb-2 block">Name *</label>
-                  <Input 
-                    name="name" 
-                    value={formData.name} 
-                    onChange={handleInputChange} 
-                    placeholder="Your name" 
-                    className={`bg-secondary/30 border-border/50 focus:border-primary ${formErrors.name ? 'border-red-500' : ''}`}
-                  />
-                  {formErrors.name && <p className="text-xs text-red-500 mt-1">{formErrors.name}</p>}
+            {/* Contact Form - Simplified */}
+            <div className="bg-card border border-border rounded-xl p-8">
+              <h3 className="text-xl font-bold text-foreground mb-6 text-center">Send a Message</h3>
+              <form 
+                action="https://formspree.io/f/xanyqvvb" 
+                method="POST" 
+                className="space-y-6"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const form = e.target as HTMLFormElement;
+                  const formData = new FormData(form);
+                  
+                  fetch('https://formspree.io/f/xanyqvvb', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                      'Accept': 'application/json'
+                    }
+                  }).then(response => {
+                    if (response.ok) {
+                      alert('Message sent successfully! I\'ll get back to you soon.');
+                      form.reset();
+                    } else {
+                      alert('There was an error sending your message. Please try again.');
+                    }
+                  }).catch(() => {
+                    alert('There was an error sending your message. Please try again.');
+                  });
+                }}
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
+                      Name *
+                    </label>
+                    <input
+                      type="text"
+                      id="name"
+                      name="name"
+                      required
+                      className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-foreground"
+                      placeholder="Your name"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
+                      Email *
+                    </label>
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      required
+                      className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-foreground"
+                      placeholder="your@email.com"
+                    />
+                  </div>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-foreground mb-2 block">Email *</label>
-                  <Input 
-                    name="email" 
-                    type="email" 
-                    value={formData.email} 
-                    onChange={handleInputChange} 
-                    placeholder="your@email.com" 
-                    className={`bg-secondary/30 border-border/50 focus:border-primary ${formErrors.email ? 'border-red-500' : ''}`}
-                  />
-                  {formErrors.email && <p className="text-xs text-red-500 mt-1">{formErrors.email}</p>}
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-foreground mb-2 block">Subject</label>
-                  <Input 
-                    name="subject" 
-                    value={formData.subject} 
-                    onChange={handleInputChange} 
-                    placeholder="Project inquiry" 
-                    className="bg-secondary/30 border-border/50 focus:border-primary" 
+                  <label htmlFor="subject" className="block text-sm font-medium text-foreground mb-2">
+                    Subject
+                  </label>
+                  <input
+                    type="text"
+                    id="subject"
+                    name="subject"
+                    className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-foreground"
+                    placeholder="Project inquiry"
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-foreground mb-2 block">Message *</label>
-                  <Textarea 
-                    name="message" 
-                    value={formData.message} 
-                    onChange={handleInputChange} 
-                    placeholder="Tell me about your project..." 
-                    rows={4} 
-                    className={`bg-secondary/30 border-border/50 focus:border-primary resize-none ${formErrors.message ? 'border-red-500' : ''}`}
-                  />
-                  {formErrors.message && <p className="text-xs text-red-500 mt-1">{formErrors.message}</p>}
+                  <label htmlFor="message" className="block text-sm font-medium text-foreground mb-2">
+                    Message *
+                  </label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    required
+                    rows={5}
+                    className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-foreground resize-none"
+                    placeholder="Tell me about your project..."
+                  ></textarea>
                 </div>
-                <Button type="submit" disabled={isSubmitting || isSubmitted} className="w-full btn-primary">
-                  {isSubmitting ? (
-                    <><div className="h-4 w-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin mr-2" />Sending...</>
-                  ) : isSubmitted ? (
-                    <><CheckCircle className="h-5 w-5 mr-2" />Sent!</>
-                  ) : (
-                    <><Send className="h-5 w-5 mr-2" />Send Message</>
-                  )}
-                </Button>
+                <input type="hidden" name="_subject" value="[Portfolio - HIGH PRIORITY] New Contact Form Submission" />
+                <input type="hidden" name="_next" value="https://kkweli.github.io/portfolio/#contact" />
+                <button
+                  type="submit"
+                  className="w-full bg-primary text-primary-foreground font-semibold py-3 px-6 rounded-lg hover:bg-primary/90 transition-colors duration-300 flex items-center justify-center"
+                >
+                  <Send className="h-5 w-5 mr-2" />
+                  Send Message
+                </button>
               </form>
             </div>
           </div>
