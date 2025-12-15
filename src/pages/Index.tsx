@@ -474,13 +474,6 @@ const Index = () => {
                   <Linkedin className="h-5 w-5 mr-2" />
                   LinkedIn
                 </a>
-                <a 
-                  href="mailto:wanjohi_gm@live.com" 
-                  className="inline-flex items-center px-6 py-3 bg-card border border-border rounded-lg hover:bg-primary hover:text-primary-foreground transition-all duration-300"
-                >
-                  <Mail className="h-5 w-5 mr-2" />
-                  Email Me
-                </a>
               </div>
             </div>
 
@@ -491,28 +484,6 @@ const Index = () => {
                 action="https://formspree.io/f/xanyqvvb" 
                 method="POST" 
                 className="space-y-6"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  const form = e.target as HTMLFormElement;
-                  const formData = new FormData(form);
-                  
-                  fetch('https://formspree.io/f/xanyqvvb', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                      'Accept': 'application/json'
-                    }
-                  }).then(response => {
-                    if (response.ok) {
-                      alert('Message sent successfully! I\'ll get back to you soon.');
-                      form.reset();
-                    } else {
-                      alert('There was an error sending your message. Please try again.');
-                    }
-                  }).catch(() => {
-                    alert('There was an error sending your message. Please try again.');
-                  });
-                }}
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
