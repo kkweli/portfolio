@@ -540,10 +540,23 @@ const Index = () => {
                   } catch (error) {
                     console.error('Form submission error:', error);
                     
-                    // Show error message
+                    // Fallback: Use mailto as guaranteed delivery method
+                    const formData = new FormData(form);
+                    const name = formData.get('name') as string;
+                    const email = formData.get('email') as string;
+                    const subject = formData.get('subject') as string || 'Contact Form Submission';
+                    const message = formData.get('message') as string;
+                    
+                    const mailtoLink = `mailto:wanjohi_gm@live.com?subject=${encodeURIComponent(`[Portfolio - HIGH PRIORITY] ${subject}`)}&body=${encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}\n\nSent from: Portfolio Contact Form`)}`;
+                    window.location.href = mailtoLink;
+                    
+                    // Show fallback message
                     submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>Error - Try Again';
-                    submitBtn.className = 'w-full bg-red-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-300 flex items-center justify-center';
+                    submitBtn.innerHTML = '<svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>Email Client Opened';
+                    submitBtn.className = 'w-full bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-300 flex items-center justify-center';
+                    
+                    // Reset form
+                    form.reset();
                     
                     // Reset button after 3 seconds
                     setTimeout(() => {
