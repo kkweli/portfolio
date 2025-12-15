@@ -482,6 +482,9 @@ const Index = () => {
             <div className="bg-card border border-border rounded-xl p-8">
               <h3 className="text-xl font-bold text-foreground mb-6 text-center">Send a Message</h3>
               <form 
+                name="contact"
+                method="POST"
+                data-netlify="true"
                 className="space-y-6"
                 onSubmit={async (e) => {
                   e.preventDefault();
@@ -495,21 +498,25 @@ const Index = () => {
                   
                   try {
                     const formData = new FormData(form);
+                    const name = formData.get('name') as string;
+                    const email = formData.get('email') as string;
+                    const subject = formData.get('subject') as string || 'Contact Form Submission';
+                    const message = formData.get('message') as string;
                     
-                    // Add Web3Forms configuration
-                    formData.append('access_key', 'c5b5c8a8-8b5a-4b5a-8b5a-8b5a8b5a8b5a'); // Free public key
-                    formData.append('subject', `[Portfolio - HIGH PRIORITY] ${formData.get('subject') || 'Contact Form Submission'}`);
-                    formData.append('from_name', 'Portfolio Contact Form');
-                    formData.append('redirect', 'false'); // Don't redirect
-                    
-                    const response = await fetch('https://api.web3forms.com/submit', {
+                    // Use Netlify Forms (works on any static site)
+                    const response = await fetch('/', {
                       method: 'POST',
-                      body: formData
+                      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                      body: new URLSearchParams({
+                        'form-name': 'contact',
+                        'name': name,
+                        'email': email,
+                        'subject': `[Portfolio - HIGH PRIORITY] ${subject}`,
+                        'message': message
+                      }).toString()
                     });
                     
-                    const result = await response.json();
-                    
-                    if (result.success) {
+                    if (response.ok) {
                       // Show success message
                       submitBtn.disabled = false;
                       submitBtn.innerHTML = '<svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Message Sent!';
@@ -524,16 +531,29 @@ const Index = () => {
                         submitBtn.className = 'w-full bg-primary text-primary-foreground font-semibold py-3 px-6 rounded-lg hover:bg-primary/90 transition-colors duration-300 flex items-center justify-center';
                       }, 3000);
                     } else {
-                      throw new Error(result.message || 'Failed to send message');
+                      throw new Error('Network response was not ok');
                     }
                     
                   } catch (error) {
                     console.error('Form submission error:', error);
                     
-                    // Show error message
+                    // Fallback to mailto as last resort
+                    const formData = new FormData(form);
+                    const name = formData.get('name') as string;
+                    const email = formData.get('email') as string;
+                    const subject = formData.get('subject') as string || 'Contact Form Submission';
+                    const message = formData.get('message') as string;
+                    
+                    const mailtoLink = `mailto:wanjohi_gm@live.com?subject=${encodeURIComponent(`[Portfolio - HIGH PRIORITY] ${subject}`)}&body=${encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`)}`;
+                    window.location.href = mailtoLink;
+                    
+                    // Show success message (since mailto opened)
                     submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>Error - Try Again';
-                    submitBtn.className = 'w-full bg-red-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-300 flex items-center justify-center';
+                    submitBtn.innerHTML = '<svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Email Client Opened!';
+                    submitBtn.className = 'w-full bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-300 flex items-center justify-center';
+                    
+                    // Reset form
+                    form.reset();
                     
                     // Reset button after 3 seconds
                     setTimeout(() => {
@@ -596,10 +616,8 @@ const Index = () => {
                     placeholder="Tell me about your project..."
                   ></textarea>
                 </div>
-                {/* Hidden fields for Web3Forms */}
-                <input type="hidden" name="access_key" value="c5b5c8a8-8b5a-4b5a-8b5a-8b5a8b5a8b5a" />
-                <input type="hidden" name="redirect" value="false" />
-                <input type="hidden" name="from_name" value="Portfolio Contact Form" />
+                {/* Hidden field for Netlify Forms */}
+                <input type="hidden" name="form-name" value="contact" />
                 
                 <button
                   type="submit"
