@@ -1,17 +1,16 @@
 import { useState, useEffect, useRef } from "react";
 import { 
-  ArrowRight, Github, Linkedin, Mail, ChevronDown, Monitor, Activity, Brain, GitBranch,
+  ArrowRight, Github, Linkedin, Mail, ChevronDown,
   MapPin, Calendar, Shield, Cloud, Code, Award, ExternalLink, Send, CheckCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { personalInfo } from "@/data/personal";
 import { skillCategories } from "@/data/skills";
 import { experiences } from "@/data/experience";
 import { featuredProjects } from "@/data/projects";
 import { certificationsByCategory } from "@/data/education";
+import { emailjsConfig } from "@/config/emailjs";
 import emailjs from '@emailjs/browser';
 
 const Index = () => {
@@ -88,23 +87,29 @@ const Index = () => {
     setIsSubmitting(true);
 
     try {
-      // Send email using Formspree
-      const response = await fetch('https://formspree.io/f/xanyqvvb', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          subject: formData.subject || "Portfolio Contact Form",
-          message: formData.message,
-          _subject: `[Portfolio - HIGH PRIORITY] ${formData.subject || 'New Contact Form Submission'}`,
-          _replyto: formData.email,
-        }),
-      });
+      // Send email using EmailJS
+      const templateParams = {
+        // Standard EmailJS variables
+        from_name: formData.name,
+        from_email: formData.email,
+        to_name: 'George Wanjohi',
+        to_email: personalInfo.email,
+        subject: formData.subject || 'New Contact Form Submission',
+        message: formData.message,
+        
+        // Custom variables
+        sent_at: new Date().toLocaleString(),
+        reply_to: formData.email,
+      };
 
-      if (response.ok) {
+      const response = await emailjs.send(
+        emailjsConfig.serviceId,
+        emailjsConfig.templateId,
+        templateParams,
+        emailjsConfig.publicKey
+      );
+
+      if (response.status === 200) {
         setIsSubmitted(true);
         toast({ 
           title: "Message Sent Successfully!", 
@@ -117,6 +122,7 @@ const Index = () => {
         throw new Error('Failed to send message');
       }
     } catch (error) {
+      console.error('EmailJS Error:', error);
       toast({ 
         title: "Error", 
         description: "Failed to send message. Please try again or email me directly.", 
@@ -137,12 +143,6 @@ const Index = () => {
     };
     return colors[category] || "bg-muted/10 text-muted-foreground border-muted/30";
   };
-
-  const allCertifications = [
-    ...certificationsByCategory.technical,
-    ...certificationsByCategory.leadership,
-    ...certificationsByCategory.banking
-  ];
 
   return (
     <div className="bg-background">
@@ -481,46 +481,7 @@ const Index = () => {
             {/* Contact Form - EmailJS */}
             <div className="bg-card border border-border rounded-xl p-8">
               <h3 className="text-xl font-bold text-foreground mb-6 text-center">Send a Message</h3>
-              <form 
-                className="space-y-6"
-                onSubmit={async (e) => {
-                  e.preventDefault();
-                  const form = e.target as HTMLFormElement;
-                  const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
-                  const originalText = submitBtn.innerHTML;
-                  
-                  // Show loading state
-                  submitBtn.disabled = true;
-                  submitBtn.innerHTML = '<div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>Sending...';
-                  
-                  // Use mailto - the most reliable method for static sites
-                  const formData = new FormData(form);
-                  const name = formData.get('name') as string;
-                  const email = formData.get('email') as string;
-                  const subject = formData.get('subject') as string || 'Contact Form Submission';
-                  const message = formData.get('message') as string;
-                  
-                  // Create mailto link with professional formatting
-                  const mailtoLink = `mailto:wanjohi_gm@live.com?subject=${encodeURIComponent(`[Portfolio - HIGH PRIORITY] ${subject}`)}&body=${encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}\n\nSent from: Portfolio Contact Form\nTimestamp: ${new Date().toLocaleString()}`)}`;
-                  
-                  // Open email client
-                  window.location.href = mailtoLink;
-                  
-                  // Show success message
-                  submitBtn.disabled = false;
-                  submitBtn.innerHTML = '<svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>Email Ready to Send!';
-                  submitBtn.className = 'w-full bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-300 flex items-center justify-center';
-                  
-                  // Reset form
-                  form.reset();
-                  
-                  // Reset button after 3 seconds
-                  setTimeout(() => {
-                    submitBtn.innerHTML = originalText;
-                    submitBtn.className = 'w-full bg-primary text-primary-foreground font-semibold py-3 px-6 rounded-lg hover:bg-primary/90 transition-colors duration-300 flex items-center justify-center';
-                  }, 3000);
-                }}
-              >
+              <form className="space-y-6" onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
@@ -530,10 +491,17 @@ const Index = () => {
                       type="text"
                       id="name"
                       name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
                       required
-                      className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-foreground"
+                      className={`w-full px-4 py-3 bg-background border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-foreground ${
+                        formErrors.name ? 'border-red-500' : 'border-border'
+                      }`}
                       placeholder="Your name"
                     />
+                    {formErrors.name && (
+                      <p className="text-red-500 text-sm mt-1">{formErrors.name}</p>
+                    )}
                   </div>
                   <div>
                     <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
@@ -543,10 +511,17 @@ const Index = () => {
                       type="email"
                       id="email"
                       name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
                       required
-                      className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-foreground"
+                      className={`w-full px-4 py-3 bg-background border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-foreground ${
+                        formErrors.email ? 'border-red-500' : 'border-border'
+                      }`}
                       placeholder="your@email.com"
                     />
+                    {formErrors.email && (
+                      <p className="text-red-500 text-sm mt-1">{formErrors.email}</p>
+                    )}
                   </div>
                 </div>
                 <div>
@@ -557,6 +532,8 @@ const Index = () => {
                     type="text"
                     id="subject"
                     name="subject"
+                    value={formData.subject}
+                    onChange={handleInputChange}
                     className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-foreground"
                     placeholder="Project inquiry"
                   />
@@ -568,20 +545,48 @@ const Index = () => {
                   <textarea
                     id="message"
                     name="message"
+                    value={formData.message}
+                    onChange={handleInputChange}
                     required
                     rows={5}
-                    className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-foreground resize-none"
+                    className={`w-full px-4 py-3 bg-background border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-foreground resize-none ${
+                      formErrors.message ? 'border-red-500' : 'border-border'
+                    }`}
                     placeholder="Tell me about your project..."
-                  ></textarea>
+                  />
+                  {formErrors.message && (
+                    <p className="text-red-500 text-sm mt-1">{formErrors.message}</p>
+                  )}
                 </div>
 
                 
                 <button
                   type="submit"
-                  className="w-full bg-primary text-primary-foreground font-semibold py-3 px-6 rounded-lg hover:bg-primary/90 transition-colors duration-300 flex items-center justify-center"
+                  disabled={isSubmitting}
+                  className={`w-full font-semibold py-3 px-6 rounded-lg transition-colors duration-300 flex items-center justify-center ${
+                    isSubmitted 
+                      ? 'bg-green-600 text-white' 
+                      : isSubmitting 
+                        ? 'bg-gray-600 text-white cursor-not-allowed' 
+                        : 'bg-primary text-primary-foreground hover:bg-primary/90'
+                  }`}
                 >
-                  <Send className="h-5 w-5 mr-2" />
-                  Send Message
+                  {isSubmitting ? (
+                    <>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                      Sending...
+                    </>
+                  ) : isSubmitted ? (
+                    <>
+                      <CheckCircle className="h-5 w-5 mr-2" />
+                      Message Sent!
+                    </>
+                  ) : (
+                    <>
+                      <Send className="h-5 w-5 mr-2" />
+                      Send Message
+                    </>
+                  )}
                 </button>
               </form>
             </div>
