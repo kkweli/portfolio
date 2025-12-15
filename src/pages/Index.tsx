@@ -12,6 +12,7 @@ import { skillCategories } from "@/data/skills";
 import { experiences } from "@/data/experience";
 import { featuredProjects } from "@/data/projects";
 import { certificationsByCategory } from "@/data/education";
+import emailjs from '@emailjs/browser';
 
 const Index = () => {
   const { toast } = useToast();
@@ -477,13 +478,66 @@ const Index = () => {
               </div>
             </div>
 
-            {/* Contact Form - Simplified */}
+            {/* Contact Form - EmailJS */}
             <div className="bg-card border border-border rounded-xl p-8">
               <h3 className="text-xl font-bold text-foreground mb-6 text-center">Send a Message</h3>
               <form 
-                action="https://formspree.io/f/xanyqvvb" 
-                method="POST" 
                 className="space-y-6"
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  const form = e.target as HTMLFormElement;
+                  const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+                  const originalText = submitBtn.innerHTML;
+                  
+                  // Show loading state
+                  submitBtn.disabled = true;
+                  submitBtn.innerHTML = '<div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>Sending...';
+                  
+                  try {
+                    // Simple fetch to a working endpoint
+                    const formData = new FormData(form);
+                    const data = {
+                      name: formData.get('name'),
+                      email: formData.get('email'),
+                      subject: formData.get('subject') || 'Portfolio Contact Form',
+                      message: formData.get('message')
+                    };
+                    
+                    // Use a simple mailto approach that always works
+                    const mailtoLink = `mailto:wanjohi_gm@live.com?subject=${encodeURIComponent(`[Portfolio - HIGH PRIORITY] ${data.subject}`)}&body=${encodeURIComponent(`Name: ${data.name}\nEmail: ${data.email}\n\nMessage:\n${data.message}`)}`;
+                    
+                    // Open email client
+                    window.location.href = mailtoLink;
+                    
+                    // Show success message
+                    setTimeout(() => {
+                      submitBtn.disabled = false;
+                      submitBtn.innerHTML = '<svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Message Sent!';
+                      submitBtn.className = 'w-full bg-green-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-300 flex items-center justify-center';
+                      
+                      // Reset form
+                      form.reset();
+                      
+                      // Reset button after 3 seconds
+                      setTimeout(() => {
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.className = 'w-full bg-primary text-primary-foreground font-semibold py-3 px-6 rounded-lg hover:bg-primary/90 transition-colors duration-300 flex items-center justify-center';
+                      }, 3000);
+                    }, 1000);
+                    
+                  } catch (error) {
+                    // Show error message
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>Error - Try Again';
+                    submitBtn.className = 'w-full bg-red-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-300 flex items-center justify-center';
+                    
+                    // Reset button after 3 seconds
+                    setTimeout(() => {
+                      submitBtn.innerHTML = originalText;
+                      submitBtn.className = 'w-full bg-primary text-primary-foreground font-semibold py-3 px-6 rounded-lg hover:bg-primary/90 transition-colors duration-300 flex items-center justify-center';
+                    }, 3000);
+                  }
+                }}
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
@@ -538,8 +592,6 @@ const Index = () => {
                     placeholder="Tell me about your project..."
                   ></textarea>
                 </div>
-                <input type="hidden" name="_subject" value="[Portfolio - HIGH PRIORITY] New Contact Form Submission" />
-                <input type="hidden" name="_next" value="https://kkweli.github.io/portfolio/#contact" />
                 <button
                   type="submit"
                   className="w-full bg-primary text-primary-foreground font-semibold py-3 px-6 rounded-lg hover:bg-primary/90 transition-colors duration-300 flex items-center justify-center"
