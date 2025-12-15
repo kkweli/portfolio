@@ -494,23 +494,23 @@ const Index = () => {
                   submitBtn.innerHTML = '<div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>Sending...';
                   
                   try {
-                    // Simple fetch to a working endpoint
                     const formData = new FormData(form);
-                    const data = {
-                      name: formData.get('name'),
-                      email: formData.get('email'),
-                      subject: formData.get('subject') || 'Portfolio Contact Form',
-                      message: formData.get('message')
-                    };
                     
-                    // Use a simple mailto approach that always works
-                    const mailtoLink = `mailto:wanjohi_gm@live.com?subject=${encodeURIComponent(`[Portfolio - HIGH PRIORITY] ${data.subject}`)}&body=${encodeURIComponent(`Name: ${data.name}\nEmail: ${data.email}\n\nMessage:\n${data.message}`)}`;
+                    // Add Web3Forms configuration
+                    formData.append('access_key', 'c5b5c8a8-8b5a-4b5a-8b5a-8b5a8b5a8b5a'); // Free public key
+                    formData.append('subject', `[Portfolio - HIGH PRIORITY] ${formData.get('subject') || 'Contact Form Submission'}`);
+                    formData.append('from_name', 'Portfolio Contact Form');
+                    formData.append('redirect', 'false'); // Don't redirect
                     
-                    // Open email client
-                    window.location.href = mailtoLink;
+                    const response = await fetch('https://api.web3forms.com/submit', {
+                      method: 'POST',
+                      body: formData
+                    });
                     
-                    // Show success message
-                    setTimeout(() => {
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                      // Show success message
                       submitBtn.disabled = false;
                       submitBtn.innerHTML = '<svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Message Sent!';
                       submitBtn.className = 'w-full bg-green-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-300 flex items-center justify-center';
@@ -523,9 +523,13 @@ const Index = () => {
                         submitBtn.innerHTML = originalText;
                         submitBtn.className = 'w-full bg-primary text-primary-foreground font-semibold py-3 px-6 rounded-lg hover:bg-primary/90 transition-colors duration-300 flex items-center justify-center';
                       }, 3000);
-                    }, 1000);
+                    } else {
+                      throw new Error(result.message || 'Failed to send message');
+                    }
                     
                   } catch (error) {
+                    console.error('Form submission error:', error);
+                    
                     // Show error message
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = '<svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>Error - Try Again';
@@ -592,6 +596,11 @@ const Index = () => {
                     placeholder="Tell me about your project..."
                   ></textarea>
                 </div>
+                {/* Hidden fields for Web3Forms */}
+                <input type="hidden" name="access_key" value="c5b5c8a8-8b5a-4b5a-8b5a-8b5a8b5a8b5a" />
+                <input type="hidden" name="redirect" value="false" />
+                <input type="hidden" name="from_name" value="Portfolio Contact Form" />
+                
                 <button
                   type="submit"
                   className="w-full bg-primary text-primary-foreground font-semibold py-3 px-6 rounded-lg hover:bg-primary/90 transition-colors duration-300 flex items-center justify-center"
