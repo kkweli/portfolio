@@ -493,77 +493,32 @@ const Index = () => {
                   submitBtn.disabled = true;
                   submitBtn.innerHTML = '<div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>Sending...';
                   
-                  try {
-                    const formData = new FormData(form);
-                    
-                    // Create a simple form submission that actually works
-                    const name = formData.get('name') as string;
-                    const email = formData.get('email') as string;
-                    const subject = formData.get('subject') as string || 'Contact Form Submission';
-                    const message = formData.get('message') as string;
-                    
-                    // Use a reliable service - Formspree with proper endpoint
-                    const response = await fetch('https://formspree.io/f/xdkogpvw', {
-                      method: 'POST',
-                      headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                      },
-                      body: JSON.stringify({
-                        name: name,
-                        email: email,
-                        subject: `[Portfolio - HIGH PRIORITY] ${subject}`,
-                        message: message,
-                        _replyto: email,
-                        _subject: `[Portfolio - HIGH PRIORITY] ${subject}`
-                      })
-                    });
-                    
-                    if (response.ok) {
-                      // Show success message
-                      submitBtn.disabled = false;
-                      submitBtn.innerHTML = '<svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Message Sent!';
-                      submitBtn.className = 'w-full bg-green-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-300 flex items-center justify-center';
-                      
-                      // Reset form
-                      form.reset();
-                      
-                      // Reset button after 3 seconds
-                      setTimeout(() => {
-                        submitBtn.innerHTML = originalText;
-                        submitBtn.className = 'w-full bg-primary text-primary-foreground font-semibold py-3 px-6 rounded-lg hover:bg-primary/90 transition-colors duration-300 flex items-center justify-center';
-                      }, 3000);
-                    } else {
-                      throw new Error('Failed to send message');
-                    }
-                    
-                  } catch (error) {
-                    console.error('Form submission error:', error);
-                    
-                    // Fallback: Use mailto as guaranteed delivery method
-                    const formData = new FormData(form);
-                    const name = formData.get('name') as string;
-                    const email = formData.get('email') as string;
-                    const subject = formData.get('subject') as string || 'Contact Form Submission';
-                    const message = formData.get('message') as string;
-                    
-                    const mailtoLink = `mailto:wanjohi_gm@live.com?subject=${encodeURIComponent(`[Portfolio - HIGH PRIORITY] ${subject}`)}&body=${encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}\n\nSent from: Portfolio Contact Form`)}`;
-                    window.location.href = mailtoLink;
-                    
-                    // Show fallback message
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>Email Client Opened';
-                    submitBtn.className = 'w-full bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-300 flex items-center justify-center';
-                    
-                    // Reset form
-                    form.reset();
-                    
-                    // Reset button after 3 seconds
-                    setTimeout(() => {
-                      submitBtn.innerHTML = originalText;
-                      submitBtn.className = 'w-full bg-primary text-primary-foreground font-semibold py-3 px-6 rounded-lg hover:bg-primary/90 transition-colors duration-300 flex items-center justify-center';
-                    }, 3000);
-                  }
+                  // Use mailto - the most reliable method for static sites
+                  const formData = new FormData(form);
+                  const name = formData.get('name') as string;
+                  const email = formData.get('email') as string;
+                  const subject = formData.get('subject') as string || 'Contact Form Submission';
+                  const message = formData.get('message') as string;
+                  
+                  // Create mailto link with professional formatting
+                  const mailtoLink = `mailto:wanjohi_gm@live.com?subject=${encodeURIComponent(`[Portfolio - HIGH PRIORITY] ${subject}`)}&body=${encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}\n\nSent from: Portfolio Contact Form\nTimestamp: ${new Date().toLocaleString()}`)}`;
+                  
+                  // Open email client
+                  window.location.href = mailtoLink;
+                  
+                  // Show success message
+                  submitBtn.disabled = false;
+                  submitBtn.innerHTML = '<svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>Email Ready to Send!';
+                  submitBtn.className = 'w-full bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-300 flex items-center justify-center';
+                  
+                  // Reset form
+                  form.reset();
+                  
+                  // Reset button after 3 seconds
+                  setTimeout(() => {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.className = 'w-full bg-primary text-primary-foreground font-semibold py-3 px-6 rounded-lg hover:bg-primary/90 transition-colors duration-300 flex items-center justify-center';
+                  }, 3000);
                 }}
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
